@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from deep_surv import DeepSurv
 
 """
-## Load data
+Load data
 """
 
 def load_SRTR_dynamic(df):
