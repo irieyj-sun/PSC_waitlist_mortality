@@ -30,7 +30,7 @@ def load_SRTR_dynamic(df):
 
     return train_df, val_df, test_df, cols
 
-longiall= pd.read_csv('/PSC/data/longi_subset.csv',index_col=0)
+longiall= pd.read_csv('/PSC/data/srtr_subset.csv',index_col=0)
 
 train_df, val_df, test_df, cols = load_SRTR_dynamic(longiall)
 
