@@ -6,6 +6,7 @@ from sklearn.preprocessing import StandardScaler
 
 import sksurv
 from sksurv.ensemble import RandomSurvivalForest
+from sksurv.linear_model import CoxPHSurvivalAnalysis
 from sksurv.metrics import concordance_index_censored
 import warnings
 from sklearn.exceptions import ConvergenceWarning
@@ -156,9 +157,9 @@ def dynamic_score_dynamic_predictions(col, df, t_times, delta_t_times, NUM_ITERA
     return out_mat
 
 
-out_file = "rsf_hparam.txt"
+rsf_out_file = "rsf_hparam.txt"
 
-print('Training')
+print('RSF_Training')
 
 for max_features in (2,5):
     
@@ -198,7 +199,7 @@ for max_features in (2,5):
 
             except ValueError:
 
-                with open(out_file, "a") as f:
+                with open(rsf_out_file, "a") as f:
 
                     f.write("NaN\n")
 
@@ -210,17 +211,33 @@ delta_t_times = [30, 60, 90, 183, 365, float("inf")]    # Prediction horizon tim
 
 death_te["risk"] = rsf1_best.predict(d_te_matrix)
 
-out_mats = {}
-out_mats['test'] = dynamic_score_dynamic_predictions("risk",death_te, t_times, delta_t_times, 100)
+rsf_out_mats = {}
+rsf_out_mats['test'] = dynamic_score_dynamic_predictions("risk",death_te, t_times, delta_t_times, 100)
 
-print('Training complete')
-print('SRTR C-index performance')
-out_mats['test'].mean(axis=2)
+print('RSF Training complete')
+print('RSF SRTR C-index performance')
+rsf_out_mats['test'].mean(axis=2)
 
 filename = "PSC_SRTR_RSF.pkl"
 pickle.dump(rsf1_best, open(filename, 'wb'))
 
+print("CPH_training")
+cph = CoxPHSurvivalAnalysis(alpha=0.1)
+    
+cph.fit(d_train_matrix, d_train_Y)
 
+death_te = death_te.drop('risk',axis=1)
+death_te["risk"] = model.predict(d_te_matrix)
+
+cph_out_mats = {}
+cph_out_mats['test'] = dynamic_score_dynamic_predictions("risk",death_te, t_times, delta_t_times, 100)
+
+print('CPH Training complete')
+print('CPH SRTR C-index performance')
+cph_out_mats['test'].mean(axis=2)
+
+filename = "PSC_SRTR_CPH.pkl"
+pickle.dump(cph, open(filename, 'wb'))
 
 """
 Test on UHN data
@@ -262,13 +279,22 @@ uhn_test_T = uhn_test_df['wl_to_event']
 uhn_test_E = uhn_test_df['event']
 uhn_test_Y = np.array([(bool(e), t) for (e, t) in zip(uhn_test_E, uhn_test_T)], dtype=[("e", bool), ("t", float)])
 
-
+print('UHN C-index performance')
 uhn_test_df["risk"] = rsf1_best.predict(uhn_test_features)
 
-t_times = [0, 30, 60, 90, 183, 365]       # Reference times
-delta_t_times = [30, 60, 90, 183, 365,float('inf')]    # Prediction horizon times
+uhn_rsf_out_mats ={}
+uhn_rsf_out_mats=dynamic_score_dynamic_predictions("risk",uhn_test_df, t_times, delta_t_times,100)
 
-out_mats=dynamic_score_dynamic_predictions("risk",uhn_test_df, t_times, delta_t_times,100)
+uhn_rsf_out_mats.mean(axis=2)
+
 
 print('UHN C-index performance')
-out_mats.mean(axis=2)
+duhn_test_df = uhn_test_df.drop('risk',axis=1)
+uhn_test_df["risk"] = cph.predict(uhn_test_features)
+
+uhn_cph_out_mats ={}
+uhn_cph_out_mats=dynamic_score_dynamic_predictions("risk",uhn_test_df, t_times, delta_t_times,100)
+
+uhn_cph_out_mats.mean(axis=2)
+
+print('Complete')
