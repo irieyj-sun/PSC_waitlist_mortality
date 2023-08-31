@@ -27,7 +27,7 @@ def load_SRTR_dynamic(df):
     
     px_ids = {}
     for split in ["train", "val", "test"]:
-        with open(f"/Users/iriesun/MLcodes/PSC2.0/data/data_splits/{split}_split.txt") as f:
+        with open(f"/PSC/data/data_splits/{split}_split.txt") as f:
             px_ids[split] = [float(id) for id in f]
 
     train_df= df[df["PX_ID"].isin(px_ids["train"])]
@@ -37,7 +37,7 @@ def load_SRTR_dynamic(df):
 
     return train_df, val_df, test_df, cols
 
-longi_subset= pd.read_csv('/Users/iriesun/MLcodes/PSC2.0/data/longi_subset.csv',index_col=0)
+longi_subset= pd.read_csv('/PSC/data/longi_subset.csv',index_col=0)
 train_df, val_df, test_df, cols = load_SRTR_dynamic(longi_subset)
 
 #create event specific df 
@@ -244,7 +244,7 @@ def load_UHN(df):
 
     return train_df,test_df, cols
 
-psc_uhn= pd.read_csv('/Users/iriesun/MLcodes/PSC/data/uhndf_alt.csv',index_col=0)
+psc_uhn= pd.read_csv('/PSC/data/uhndf_alt.csv',index_col=0)
 psc_uhn['wl_to_event'] = psc_uhn['wl_to_event'] - psc_uhn['time_since_baseline']
 psc_uhn.loc[(psc_uhn['event'] ==2),'event'] = 0
 
