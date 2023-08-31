@@ -37,7 +37,7 @@ def load_SRTR_dynamic(df):
 
     return train_df, val_df, test_df, cols
 
-longi_subset= pd.read_csv('/PSC/data/longi_subset.csv',index_col=0)
+longi_subset= pd.read_csv('/PSC/data/srtr_subset.csv',index_col=0)
 train_df, val_df, test_df, cols = load_SRTR_dynamic(longi_subset)
 
 #create event specific df 
@@ -244,7 +244,7 @@ def load_UHN(df):
 
     return train_df,test_df, cols
 
-psc_uhn= pd.read_csv('/PSC/data/uhndf_alt.csv',index_col=0)
+psc_uhn= pd.read_csv('/PSC/data/uhn_subset.csv',index_col=0)
 psc_uhn['wl_to_event'] = psc_uhn['wl_to_event'] - psc_uhn['time_since_baseline']
 psc_uhn.loc[(psc_uhn['event'] ==2),'event'] = 0
 
