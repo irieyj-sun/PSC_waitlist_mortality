@@ -106,16 +106,17 @@ get_x = lambda df: (df
 get_time = lambda df: (df['wl_to_event'].values)
 get_event = lambda df: (df['event'].values)
 
-
-rsf_out_mat = {elem : pd.DataFrame() for elem in optn_list}
-cph_out_mat = {elem : pd.DataFrame() for elem in optn_list}
-
 train_feature_df = {elem : pd.DataFrame() for elem in optn_list}
 train_target_df = {elem : pd.DataFrame() for elem in optn_list}
 
 test_feature_df = {elem : pd.DataFrame() for elem in optn_list}
 test_target_df = {elem : pd.DataFrame() for elem in optn_list}
 
+"""
+Training and test by OPTN
+"""
+rsf_out_mat = np.zeros([11,12])
+cph_out_mat = np.zeros([11,12])
 for key in test_target_df.keys():
     
     #full df
@@ -186,6 +187,9 @@ for key in train_feature_df.keys():
 
             #rsf
             test_df_record["risk"] = rsf.predict(test_features)
+
+            key = int(key)-1
+            test_key = int(test_key)-1
             rsf_out_mat[key][test_key] = dynamic_score_dynamic_predictions("risk",test_df_record, t_times, delta_t_times,10).mean(axis=(0,1,2)
                                                                                                                                   
             #cph
@@ -194,11 +198,64 @@ for key in train_feature_df.keys():
             cph_out_mat[key][test_key] = dynamic_score_dynamic_predictions("risk",test_df_record, t_times, delta_t_times,10).mean(axis=(0,1,2)))
 
 print("RSF By OPTN C-index")
-rsf_out_mat
+rsf_mat=pd.DataFrame(rsf_out_mat)
+
+rsf_mat.columns =['OPTN 1', 'OPTN 2', 'OPTN 3','OPTN 4','OPTN 5',
+        'OPTN 6','OPTN 7','OPTN 8','OPTN 9','OPTN 10','OPTN 11','UHN']
+
+# Change the row indexes
+rsf_mat.index = ['OPTN 1', 'OPTN 2', 'OPTN 3','OPTN 4','OPTN 5',
+        'OPTN 6','OPTN 7','OPTN 8','OPTN 9','OPTN 10','OPTN 11']
 
 print("CPH By OPTN C-index")
-cph_out_mat
+cph_mat=pd.DataFrame(cph_out_mat)
+
+cph_mat.columns =['OPTN 1', 'OPTN 2', 'OPTN 3','OPTN 4','OPTN 5',
+        'OPTN 6','OPTN 7','OPTN 8','OPTN 9','OPTN 10','OPTN 11','UHN']
+
+# Change the row indexes
+cph_mat.index = ['OPTN 1', 'OPTN 2', 'OPTN 3','OPTN 4','OPTN 5',
+        'OPTN 6','OPTN 7','OPTN 8','OPTN 9','OPTN 10','OPTN 11']
 
 """
 Heatmap
 """
+def create_cindex_heatmap(df,model_name):
+
+    rcParams['font.family'] = 'Times New Roman'
+
+    # Find the highest value in each column
+    highest_values = df.idxmax(axis=1)
+
+    # Create a heatmap
+    fig, ax = plt.subplots(figsize=(8,6))
+    heatmap = sns.heatmap(df, annot=True, fmt='.3f', cmap='PuBu')
+
+    # Highlight the highest values
+    for i, row in enumerate(df.index):
+        col = highest_values[i]
+        value = df.loc[row, col]
+        ax.text(df.columns.get_loc(col) + 0.5, i + 0.5, f'{value:.3f}', ha='center', va='center',
+                color='yellow', fontweight='bold')
+
+    ax.set_xlabel('Testing OPTN regions C-index')
+    ax.set_ylabel('Training OPTN regions')
+
+    plt.xticks(rotation=45, ha='right')
+    plt.yticks(rotation=45)
+
+    ax.set_title('Average C-index performance of ' + model_name + ' model trained on individual OPTN regions  ')
+
+    # Adjust plot layout
+    plt.tight_layout()
+
+    # Show the heatmap
+    plt.savefig("%s.png" % model_name)
+    
+    
+
+create_cindex_heatmap(rsf_mat,"RSF")
+create_cindex_heatmap(cph_mat,"CPH")
+
+
+print('Complete')
