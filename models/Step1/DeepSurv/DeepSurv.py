@@ -20,7 +20,7 @@ def load_SRTR_dynamic(df):
     # splits into memory.
     px_ids = {}
     for split in ["train", "val", "test"]:
-        with open(f"/Users/iriesun/MLcodes/PSC2.0/data/data_splits/{split}_split.txt") as f:
+        with open(f"/PSC/data/data_splits/{split}_split.txt") as f:
             px_ids[split] = [float(id) for id in f]
 
     train_df= df[df["PX_ID"].isin(px_ids["train"])]
@@ -30,7 +30,7 @@ def load_SRTR_dynamic(df):
 
     return train_df, val_df, test_df, cols
 
-longiall= pd.read_csv('/Users/iriesun/MLcodes/PSC/data/longi_subset.csv',index_col=0)
+longiall= pd.read_csv('/PSC/data/longi_subset.csv',index_col=0)
 
 train_df, val_df, test_df, cols = load_SRTR_dynamic(longiall)
 
@@ -241,7 +241,7 @@ results_mat.mean(axis=2)
 """
 Testing on UHN data
 """
-uhndata=pd.read_csv('/Users/iriesun/MLcodes/PSC/data/uhndf_srtr.csv',index_col=0)
+uhndata=pd.read_csv('/PSC/data/uhndf_srtr.csv',index_col=0)
 
 uhn_te_d = uhndata.copy()
 uhn_te_d.loc[(uhn_te_d['event'] ==2),'event'] = 0
