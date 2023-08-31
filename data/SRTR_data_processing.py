@@ -393,7 +393,7 @@ longi_subset['CANHX_BILI_BOUND']=longi_subset['CANHX_BILI_BOUND']*17.1
 longi_subset['CANHX_SERUM_SODIUM']=longi_subset['CANHX_SERUM_SODIUM'].astype(float)
 
 
-longi_subset.to_csv('longi_subset.csv')
+longi_subset.to_csv('srtr_subset.csv')
 
 print('Processing complete')
 
