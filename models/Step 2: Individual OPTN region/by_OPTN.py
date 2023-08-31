@@ -112,11 +112,6 @@ train_target_df = {elem : pd.DataFrame() for elem in optn_list}
 test_feature_df = {elem : pd.DataFrame() for elem in optn_list}
 test_target_df = {elem : pd.DataFrame() for elem in optn_list}
 
-"""
-Training and test by OPTN
-"""
-rsf_out_mat = np.zeros([11,12])
-cph_out_mat = np.zeros([11,12])
 for key in test_target_df.keys():
     
     #full df
@@ -135,7 +130,8 @@ for key in test_target_df.keys():
     test_event = get_event(test_df[:][test_df.optn_region == key])
     test_target_df[key] =  pd.DataFrame({'event':test_event,'wl_to_event':test_time})
 
-
+rsf_out_mat = np.zeros([11,12])
+cph_out_mat = np.zeros([11,12])
 """
 Training and testing
 """
@@ -251,8 +247,6 @@ def create_cindex_heatmap(df,model_name):
 
     # Show the heatmap
     plt.savefig("%s.png" % model_name)
-    
-    
 
 create_cindex_heatmap(rsf_mat,"RSF")
 create_cindex_heatmap(cph_mat,"CPH")
