@@ -241,7 +241,7 @@ results_mat.mean(axis=2)
 """
 Testing on UHN data
 """
-uhndata=pd.read_csv('/PSC/data/uhndf_srtr.csv',index_col=0)
+uhndata=pd.read_csv('/PSC/data/uhn_subset.csv',index_col=0)
 
 uhn_te_d = uhndata.copy()
 uhn_te_d.loc[(uhn_te_d['event'] ==2),'event'] = 0
